@@ -8,7 +8,7 @@ function setupBLE() {
   // Set up GATT services and characteristics
   NRF.setServices({
     '6e400001-b5a3-f393-e0a9-e50e24dcca9e': {
-      '6e400031-b5a3-f393-e0a9-e50e24dcca9e': {
+      '6e400003-b5a3-f393-e0a9-e50e24dcca9e': {
         value: [buttonState],        // Initial value
         readable: true,    // Allow reading the value
         writable: false,   // Disable writing to the characteristic
