@@ -10,17 +10,10 @@
  */
  
 // -------------------- INCLUDES --------------------
-#include <BTstackLib.h>           // BTstack for BLE
+#include <BTstackLib.h>           
 #include <SPI.h>
-//#include "PluggableUSBHID.h"
-//#include "USBKeyboard.h"
 #include <Keyboard.h> 
-// For Wi-Fi on Pico W (Earle Philhower core):
-#include <WiFi.h>                 // Instead of WiFiNINA.h
-//#include <WiFiClient.h>
-// -------------------- KEYBOARD SETUP --------------------
-//USBKeyboard Keyboard;
- 
+#include <WiFi.h>
 // -------------------- USER-CONFIGURABLE WIFI CREDENTIALS --------------------
 char ssid[] = "FABI";        // Access Point SSID
 char pass[] = "asterics";    // Access Point password
@@ -64,8 +57,7 @@ void gattCharacteristicNotification(BLEDevice *device, uint16_t value_handle, ui
 void gattReadCallback(BLEStatus status, BLEDevice *device, uint8_t *value, uint16_t length);
 void gattWrittenCallback(BLEStatus status, BLEDevice *device);
 
-
-const char *button_pressed = "[J1  \n"; 
+const char *button_pressed = "[J1  \n"; //Used to determine a button press
 bool currently_pressed = false;
  
 // -------------------- SETUP --------------------

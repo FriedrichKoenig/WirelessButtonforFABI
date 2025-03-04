@@ -31,14 +31,7 @@ void loop_Wifi() {
     bool isRequestLine = true;
     // wait for data to be available
     unsigned long timeout = millis();
-//    while (client.available() == 0) {
-//      if (millis() - timeout > 5000) {
-//        Serial.println(">>> Client Timeout !");
-//        client.stop();
-//        delay(60000);
-//        return;
-//      }
-//    }
+
     while (client.connected()) {
       if (client.available()) {
         char c = client.read();
@@ -96,14 +89,14 @@ void loop_Wifi() {
         }
       }
     }
-
-    //client.stop();  // Close the connection
     Serial.println("Client disconnected");
 
     // Process request
     if (request.startsWith("GET /save?")) {
       Serial.println("Saving configuration");
       parseConfig(request);
+      delay(1000);
+      Keyboard.consumerPress(KEY_F5);
     } else if (request.startsWith("GET /startBLE")) {
       Serial.println("Starting FABI (BLE)");
       startFABI();

@@ -7,12 +7,11 @@ void setup_BLE() {
   BTstack.setGATTServiceDiscoveredCallback(gattServiceDiscovered);
   BTstack.setGATTCharacteristicDiscoveredCallback(gattCharacteristicDiscovered);
   BTstack.setGATTCharacteristicNotificationCallback(gattCharacteristicNotification);
-  BTstack.setGATTCharacteristicReadCallback(gattReadCallback);
-  BTstack.setGATTCharacteristicWrittenCallback(gattWrittenCallback);
+  //BTstack.setGATTCharacteristicReadCallback(gattReadCallback);
+  //BTstack.setGATTCharacteristicWrittenCallback(gattWrittenCallback);
   BTstack.setGATTCharacteristicSubscribedCallback(gattSubscribedCallback);
-  BTstack.setGATTCharacteristicIndicationCallback(gattCharacteristicIndication);
+  //BTstack.setGATTCharacteristicIndicationCallback(gattCharacteristicIndication);
 
- 
   // Start BTstack
   BTstack.setup();
  
@@ -37,11 +36,7 @@ void advertisementCallback(BLEAdvertisement *advertisement) {
  
     // Store the device’s name
     currentConnectIndex = puckCount;
-    //puckNames[currentConnectIndex] = advertisement->getName();
     puckNames[currentConnectIndex] = advertisement->getBdAddr()->getAddressString();
-    // For an identifier, use the device's handle converted to HEX.
-    // (Assuming getHandle() returns a unique integer.)
-    //puckNames[currentConnectIndex] = String(advertisement->getHandle(), HEX);
     Serial.print("Assigning device index ");
     Serial.print(currentConnectIndex);
     Serial.print(" name: ");
@@ -64,10 +59,12 @@ void deviceConnectedCallback(BLEStatus status, BLEDevice *device) {
     // Start service discovery
     puckServiceFound[currentConnectIndex] = false;
     puckCharFound[currentConnectIndex] = false;
-    device->discoverGATTServices();
+    //BuhBuhBuhdevice->discoverGATTServices();
     //Serial.println(currentConnectIndex);
     Serial.print("Services: ");
-    Serial.println(device->discoverGATTServices());
+    Serial.println(puckDevices[currentConnectIndex].discoverGATTServices());
+    //Serial.println(device->discoverGATTServices());
+    puckDevices[currentConnectIndex].discoverGATTServices();
     
   } else if (status == BLE_STATUS_CONNECTION_TIMEOUT) {
     Serial.println("Connection timeout or error while connecting!");
@@ -114,7 +111,6 @@ void gattServiceDiscovered(BLEStatus status, BLEDevice *device, BLEService *serv
       Serial.println("Puck.js service found!");
       // Store service
       for (int i = 0; i < puckCount + 1; i++) {
-        //if (puckDevices[i].isSameDevice(device)) {
         if (puckDevices[i].getHandle() == device->getHandle()){
           puckServices[i] = *service;
           puckServiceFound[i] = true;
@@ -146,17 +142,14 @@ void gattCharacteristicDiscovered(BLEStatus status, BLEDevice *device, BLECharac
     Serial.print(characteristic->getUUID()->getUuidString());
     Serial.print(", handle 0x");
     Serial.println(characteristic->getCharacteristic()->value_handle, HEX);
-    //Serial.println(characteristic->getCharacteristic()->readValue());
+
     // Check if it's the Puck.js button characteristic
     if (characteristic->matches(&puckCharacteristicUUID)) {
       Serial.println("Puck.js characteristic found!");
       for (int i = 0; i < puckCount + 1; i++) {
-        //if (puckDevices[i].isSameDevice(device)) {
         if (puckDevices[i].getHandle() == device->getHandle()){
           puckChars[i] = *characteristic;
           puckCharFound[i] = true;
-
-          Serial.print("Important Handle: ");
           Serial.println(puckDevices[i].getHandle());
         }
       }
@@ -216,17 +209,11 @@ void gattCharacteristicNotification(BLEDevice *device, uint16_t value_handle, ui
     char* v = (char *)value;
     Serial.print("Value: ");
     Serial.println(v[4]);
-//    bool pressed = (v);  // Check if second bit is set
-//    Serial.print("Pressed: ");
-//    Serial.println((char *)value);
-//    Serial.println(button_pressed);
-//    Serial.println((char *)value == button_pressed);
     if (v[4] == '1' and currently_pressed == false) {
       currently_pressed = true;
       // Find which device index this is
       int devIndex = -1;
       for (int i = 0; i < puckCount; i++) {
-        //if (puckDevices[i].isSameDevice(device)) {
         if (puckDevices[i].getHandle() == device->getHandle()) {
           devIndex = i;
           break;
@@ -260,27 +247,4 @@ void gattCharacteristicNotification(BLEDevice *device, uint16_t value_handle, ui
       Serial.println("Something Strange has happened");
     }
   }
-}
- 
-// (Unused in this simple scenario, but shown for completeness)
-void gattReadCallback(BLEStatus status, BLEDevice *device, uint8_t *value, uint16_t length) {
-  Serial.println("Got a read callback");
-}
- 
-// (Unused in this simple scenario, but shown for completeness)
-void gattWrittenCallback(BLEStatus status, BLEDevice *device) {
-  Serial.print("Write completed with status ");
-  Serial.println(status);
-}
-
-void gattCharacteristicIndication(BLEDevice *device, uint16_t value_handle, uint8_t *value, uint16_t length) {
-  (void) device;
-  //(void) value_handle;
-  //(void) length;
-  Serial.print("Indication received. Length: ");
-  Serial.print(length);
-  Serial.print(", handle:");
-  Serial.print(value_handle);
-  Serial.print(", value:");
-  Serial.println((const char *)value);
 }
